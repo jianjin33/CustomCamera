@@ -18,6 +18,7 @@ public class CustomCameraAgent {
 
     public static void init(Application application) {
         mContext = application;
+        UIUtils.init();
     }
 
     /**

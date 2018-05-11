@@ -74,9 +74,9 @@ public class CameraContainer extends FrameLayout implements IActivityLifeCycle, 
 
     private void init() {
         inflate(mContext, R.layout.custom_camera_container, this);
-        mCameraView =  findViewById(R.id.camera_preview);
-        mFocusImageView = findViewById(R.id.iv_focus);
-        mZoomSeekBar = findViewById(R.id.seek_zoom);
+        mCameraView =  (CameraPreview)findViewById(R.id.camera_preview);
+        mFocusImageView = (FocusImageView)findViewById(R.id.iv_focus);
+        mZoomSeekBar = (SeekBar)findViewById(R.id.seek_zoom);
 
         mSensorController = SensorController.getInstance();
 

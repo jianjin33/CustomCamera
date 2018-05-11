@@ -11,7 +11,7 @@ public class UIUtils {
     public static int screenWidth;
     public static int screenHeight;
 
-    public UIUtils() {
+    public static void init() {
         DisplayMetrics mDisplayMetrics = CustomCameraAgent.mContext.getResources()
                 .getDisplayMetrics();
         screenWidth = mDisplayMetrics.widthPixels;
