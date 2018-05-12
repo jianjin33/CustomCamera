@@ -24,9 +24,6 @@ import com.jianjin.camera.widget.ISavePicCallback;
 public class CameraActivity extends Activity implements ISavePicCallback {
 
     // Used to load the 'native-lib' library on application startup.
-    static {
-        System.loadLibrary("native-lib");
-    }
 
     static final int CAMERA_REQUEST_CODE = 100;
 
@@ -138,7 +135,7 @@ public class CameraActivity extends Activity implements ISavePicCallback {
                 Uri uri = data.getData();
 
 //                File file = new FileStorage().createIconFile(); //工具类
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                if (Build.VERSION.SDK_INT >= 24) {
 //                    // 针对Android7.0，需要通过FileProvider封装过的路径，提供给外部调用
 //                    // 通过FileProvider创建一个content类型的Uri，进行封装
 //                    Uri imageUri = FileProvider.getUriForFile(activity, "com.pecoo.ifcoo.fileprovider", file);
@@ -161,12 +158,6 @@ public class CameraActivity extends Activity implements ISavePicCallback {
         }
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
-
     @Override
     public void saveComplete(String picPath) {
         Intent intent = new Intent(this, PicActivity.class);
@@ -180,8 +171,25 @@ public class CameraActivity extends Activity implements ISavePicCallback {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (cameraContainer != null) {
+            cameraContainer.onStart();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (cameraContainer != null) {
+            cameraContainer.onStop();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         mCameraManager.unbinding();
+        cameraContainer.releaseCamera();
     }
 }
