@@ -13,12 +13,14 @@ import com.jianjin.camera.utils.UIUtils;
 public class CustomCameraAgent {
 
     public static Context mContext;
+    public static boolean isInit;
     public static boolean isShowLog = false;
     public static String picFileName = "photos";
 
     public static void init(Application application) {
         mContext = application;
         UIUtils.init();
+        isInit = true;
     }
 
     /**

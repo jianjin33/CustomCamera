@@ -183,8 +183,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
      * accordingly
      */
     private void determineDisplayOrientation() {
+        if (mActivity == null){
+            throw new IllegalStateException("please bind activity");
+        }
+
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         Camera.getCameraInfo(mCameraId.ordinal(), cameraInfo);
+
 
         int rotation = mActivity.getWindowManager().getDefaultDisplay().getRotation();
         int degrees = 0;
@@ -284,11 +289,21 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     @Override
     public void onStart() {
         mOrientationListener.enable();
+        if (mCamera != null) {
+            mCameraManager.setPreviewLight(mCamera);
+            mCamera.startPreview();
+        }
     }
 
     @Override
     public void onStop() {
         mOrientationListener.disable();
+
+        if (mCamera != null) {
+            mCamera.setPreviewCallback(null);
+            mCamera.setPreviewCallbackWithBuffer(null);
+            mCamera.stopPreview();
+        }
     }
 
     /**

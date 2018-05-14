@@ -175,23 +175,35 @@ public class CameraActivity extends Activity implements ISavePicCallback {
     @Override
     protected void onStart() {
         super.onStart();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         if (cameraContainer != null) {
             cameraContainer.onStart();
         }
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if (cameraContainer != null) {
             cameraContainer.onStop();
         }
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        mCameraManager.unbinding();
+        mCameraManager.unbindView();
         cameraContainer.releaseCamera();
     }
 }

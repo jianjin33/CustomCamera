@@ -18,6 +18,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static com.jianjin.camera.utils.Consts.TYPE_PICTURE;
+import static com.jianjin.camera.utils.Consts.TYPE_PREVIEW;
+
 /**
  * Created by Administrator on 2018/5/9.
  * 相机管理类
@@ -29,15 +32,14 @@ public class CameraManager {
     public static List<FlashLightStatus> mFlashLightNotSupport = new ArrayList<>();
     private String[] flashHint;
     private String[] cameraDireHint;
-    public static final int TYPE_PREVIEW = 0;
-    public static final int TYPE_PICTURE = 1;
-    public static final int ALLOW_PIC_LEN = 2000;       //最大允许的照片尺寸的长度   宽或者高
+    private static final int ALLOW_PIC_LEN = 2000;       //最大允许的照片尺寸的长度   宽或者高
 
     private Context mContext;
     private CameraDirection mCameraDirection;
     private FlashLightStatus mFlashLightStatus;
     private TextView mTvFlashLight;
     private TextView mTvCameraDirection;
+    private PreviewLightCallback previewLightCallback;
 
 
     public static CameraManager getInstance(Context context) {
@@ -89,12 +91,12 @@ public class CameraManager {
         }
     }
 
-    public void unbinding() {
+    public void unbindView() {
         mTvFlashLight = null;
         mTvCameraDirection = null;
     }
 
-    protected void setCameraDirection(CameraDirection mCameraDirection) {
+    void setCameraDirection(CameraDirection mCameraDirection) {
         this.mCameraDirection = mCameraDirection;
         if (mTvCameraDirection != null) {
             if (cameraDireHint != null) {
@@ -111,11 +113,11 @@ public class CameraManager {
         }
     }
 
-    public CameraDirection getCameraDirection() {
+    CameraDirection getCameraDirection() {
         return mCameraDirection;
     }
 
-    protected void setFlashLightStatus(FlashLightStatus mFlashLightStatus) {
+    void setFlashLightStatus(FlashLightStatus mFlashLightStatus) {
         this.mFlashLightStatus = mFlashLightStatus;
         if (mTvFlashLight != null) {
             if (flashHint != null) {
@@ -127,7 +129,7 @@ public class CameraManager {
         }
     }
 
-    public FlashLightStatus getFlashLightStatus() {
+    FlashLightStatus getFlashLightStatus() {
         return mFlashLightStatus;
     }
 
@@ -137,7 +139,7 @@ public class CameraManager {
      * @param facing 前后摄像头
      * @return
      */
-    protected Camera openCamera(int facing) {
+    Camera openCamera(int facing) {
         Camera camera = null;
         if (checkCameraHardware(mContext)) {
             camera = Camera.open(getCameraId(facing));
@@ -190,77 +192,34 @@ public class CameraManager {
         }
     }
 
-    // 上次记录的时间戳
-    private long lastRecordTime = System.currentTimeMillis();
-    // 上次记录的索引
-    private int darkIndex = 0;
-    // 一个历史记录的数组，255是代表亮度最大值
-    private long[] darkList = new long[]{255, 255, 255, 255};
-    // 扫描间隔
-    private int waitScanTime = 300;
-    // 亮度低的阀值
-    private int darkValue = 60;
-
-    private void setPreviewLight(Camera camera) {
-        camera.setPreviewCallback(new Camera.PreviewCallback() {
-            @Override
-            public void onPreviewFrame(byte[] data, Camera camera) {
-                long currentTime = System.currentTimeMillis();
-                if (currentTime - lastRecordTime < waitScanTime) {
-                    return;
-                }
-                lastRecordTime = currentTime;
-
-                int width = camera.getParameters().getPreviewSize().width;
-                int height = camera.getParameters().getPreviewSize().height;
-                //像素点的总亮度
-                long pixelLightCount = 0L;
-                //像素点的总数
-                long pixeCount = width * height;
-                //采集步长，因为没有必要每个像素点都采集，可以跨一段采集一个，减少计算负担，必须大于等于1。
-                int step = 10;
-                //data.length - allCount * 1.5f的目的是判断图像格式是不是YUV420格式，只有是这种格式才相等
-                //因为int整形与float浮点直接比较会出问题，所以这么比
-                if (Math.abs(data.length - pixeCount * 1.5f) < 0.00001f) {
-                    for (int i = 0; i < pixeCount; i += step) {
-                        //如果直接加是不行的，因为data[i]记录的是色值并不是数值，byte的范围是+127到—128，
-                        // 而亮度FFFFFF是11111111是-127，所以这里需要先转为无符号unsigned long参考Byte.toUnsignedLong()
-                        pixelLightCount += ((long) data[i]) & 0xffL;
-                    }
-                    //平均亮度
-                    long cameraLight = pixelLightCount / (pixeCount / step);
-                    //更新历史记录
-                    int lightSize = darkList.length;
-                    darkList[darkIndex = darkIndex % lightSize] = cameraLight;
-                    darkIndex++;
-                    boolean isDarkEnv = true;
-                    //判断在时间范围waitScanTime * lightSize内是不是亮度过暗
-                    for (int i = 0; i < lightSize; i++) {
-                        if (darkList[i] > darkValue) {
-                            isDarkEnv = false;
-                        }
-                    }
-                    Logger.debug(TAG, "摄像头环境亮度为 ： " + cameraLight);
-                    if (mTvFlashLight != null) {
-                        // 亮度过暗显示开灯按钮
-                        if (getCameraDirection() == CameraDirection.CAMERA_BACK) {
-                            if (isDarkEnv || getFlashLightStatus() == FlashLightStatus.LIGHT_ON) {
-                                if (mTvFlashLight.getVisibility() != View.VISIBLE) {
-                                    mTvFlashLight.setVisibility(View.VISIBLE);
-                                }
-                            } else {
-                                if (mTvFlashLight.getVisibility() != View.GONE) {
-                                    mTvFlashLight.setVisibility(View.GONE);
-                                }
+    void setPreviewLight(Camera camera) {
+        if (mTvFlashLight != null && previewLightCallback == null) {
+            // 亮度过暗显示开灯按钮
+            PreviewLightCallback.OnCameraLightCallback onCameraLightCallback = new PreviewLightCallback.OnCameraLightCallback() {
+                @Override
+                public void cameraLight(boolean isDarkEnv) {
+                    // 亮度过暗显示开灯按钮
+                    if (getCameraDirection() == CameraDirection.CAMERA_BACK) {
+                        if (isDarkEnv || getFlashLightStatus() == FlashLightStatus.LIGHT_ON) {
+                            if (mTvFlashLight.getVisibility() != View.VISIBLE) {
+                                mTvFlashLight.setVisibility(View.VISIBLE);
+                            }
+                        } else {
+                            if (mTvFlashLight.getVisibility() != View.GONE) {
+                                mTvFlashLight.setVisibility(View.GONE);
                             }
                         }
                     }
                 }
-            }
-        });
+            };
+            previewLightCallback = new PreviewLightCallback(this, onCameraLightCallback);
+        }
+
+        camera.setPreviewCallback(previewLightCallback);
     }
 
-    protected void releaseCamera(Camera camera) {
+
+    void releaseCamera(Camera camera) {
         if (camera != null) {
             try {
                 camera.setPreviewCallback(null);
@@ -316,7 +275,7 @@ public class CameraManager {
      * @param camera
      * @param bl
      */
-    protected void setFitPicSize(Camera camera, float bl) {
+    void setFitPicSize(Camera camera, float bl) {
         Camera.Parameters parameters = camera.getParameters();
 
         try {
@@ -335,7 +294,7 @@ public class CameraManager {
      *
      * @param camera
      */
-    protected void setFitPreSize(Camera camera) {
+    void setFitPreSize(Camera camera) {
         Camera.Parameters parameters = camera.getParameters();
 
         try {

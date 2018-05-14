@@ -19,6 +19,7 @@ import android.widget.FrameLayout;
 import android.widget.SeekBar;
 
 import com.jianjin.camera.CameraDirection;
+import com.jianjin.camera.CustomCameraAgent;
 import com.jianjin.camera.IActivityLifeCycle;
 import com.jianjin.camera.ICameraOperation;
 import com.jianjin.camera.R;
@@ -65,6 +66,10 @@ public class CameraContainer extends FrameLayout implements IActivityLifeCycle, 
     }
 
     private void init() {
+        if (!CustomCameraAgent.isInit){
+            throw new IllegalStateException("custom must be init in application");
+        }
+
         inflate(mContext, R.layout.custom_camera_container, this);
         mCameraView = (CameraPreview) findViewById(R.id.camera_preview);
         mFocusImageView = (FocusImageView) findViewById(R.id.iv_focus);
@@ -97,7 +102,6 @@ public class CameraContainer extends FrameLayout implements IActivityLifeCycle, 
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-
                             Point point = new Point(UIUtils.screenWidth / 2, UIUtils.screenHeight / 2);
                             onCameraFocus(point);
                         }
@@ -415,7 +419,6 @@ public class CameraContainer extends FrameLayout implements IActivityLifeCycle, 
                     if (mCameraView.onFocus(point, autoFocusCallback)) {
                         mSensorController.lockFocus();
                         mFocusImageView.startFocus(point);
-
                         //播放对焦音效
 //                        if(mFocusSoundPrepared) {
 //                            mSoundPool.play(mFocusSoundId, 1.0f, 0.5f, 1, 0, 1.0f);

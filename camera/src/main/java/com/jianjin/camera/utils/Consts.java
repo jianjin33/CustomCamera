@@ -19,4 +19,7 @@ public final class Consts {
      * 放大缩小照片模式
      */
     public static final int MODE_ZOOM = 1;
+
+    public static final int TYPE_PREVIEW = 0;
+    public static final int TYPE_PICTURE = 1;
 }
