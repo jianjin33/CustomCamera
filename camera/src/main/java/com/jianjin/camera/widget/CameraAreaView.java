@@ -16,8 +16,8 @@ public class CameraAreaView extends View {
     private Paint mPaint;
     private int height;
     private int width;
-    private int CORNER_WIDTH = 20;
-    private int CORNER_LENGTH = 100;
+    private int CORNER_WIDTH = 12;
+    private int CORNER_LENGTH = 44;
 
     public CameraAreaView(Context context) {
         this(context, null);
@@ -31,8 +31,7 @@ public class CameraAreaView extends View {
         super(context, attrs, defStyleAttr);
         setBackgroundResource(android.R.color.transparent);
         mPaint = new Paint();
-        // FIXME
-        mPaint.setColor(Color.BLUE);
+        mPaint.setColor(Color.WHITE);
     }
 
     @Override
