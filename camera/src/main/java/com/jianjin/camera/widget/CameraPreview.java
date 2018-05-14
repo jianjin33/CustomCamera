@@ -156,19 +156,20 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         List<String> supportedModes = mCamera.getParameters().getSupportedFlashModes();
 
         switch (lightStatus) {
-            case LIGHT_AUTO:
+            // 不需要自动状态
+/*            case LIGHT_AUTO:
                 if (supportedModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
                     parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
                 }
-                break;
+                break;*/
             case LIGHT_OFF:
                 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
                 break;
             case LIGHT_ON:
                 if (supportedModes.contains(Camera.Parameters.FLASH_MODE_TORCH)) {
                     parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                } else if (supportedModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
-                    parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
+                /* }else if (supportedModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
+                    parameters.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);*/
                 } else if (supportedModes.contains(Camera.Parameters.FLASH_MODE_OFF)) {
                     parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
                 }
@@ -317,10 +318,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             t.printStackTrace();
             Logger.info(TAG, "photo fail after Photo Clicked");
 
-
             // fixme
             try {
-                mCamera.startPreview();
+//                mCamera.startPreview();
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -329,7 +329,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
 
         try {
-            mCamera.startPreview();
+//            mCamera.startPreview();
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -391,7 +391,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mCamera = null;
     }
 
-    public CameraDirection getCameraId(){
+    public CameraDirection getCameraId() {
         return mCameraId;
     }
 

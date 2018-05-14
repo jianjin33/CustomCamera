@@ -19,7 +19,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 
-import static com.jianjin.camera.utils.Consts.SAVE_IMG_PARENT_PATH;
 import static com.jianjin.camera.utils.Consts.SAVE_IMG_PATH;
 import static com.jianjin.camera.utils.Consts.SAVE_PICTURE_FAILURE;
 import static com.jianjin.camera.utils.Consts.SAVE_PICTURE_SUCCESS;
@@ -35,7 +34,6 @@ public class SavePicHandler extends Handler {
     private boolean isBackCamera;
     private boolean sampleSizeSuggested;
     private boolean ioExceptionRetried;     // 寻找合适的bitmap发生io异常  允许一次重试
-    private String mFilePath;
 
     /**
      * Use the provided {@link Looper} instead of the default one.
@@ -51,18 +49,23 @@ public class SavePicHandler extends Handler {
         this.isBackCamera = isBackCamera;
     }
 
+    public void setData(byte[] data, boolean isBackCamera){
+        this.data = data;
+        this.isBackCamera = isBackCamera;
+    }
+
     @Override
     public void handleMessage(Message msg) {
         super.handleMessage(msg);
         String imgPath = saveToSDCard(data);
         Message m = Message.obtain();
-        if (imgPath == null){
+        if (imgPath == null) {
             m.what = SAVE_PICTURE_FAILURE;
-        }else {
+        } else {
             m.what = SAVE_PICTURE_SUCCESS;
             Bundle bundle = new Bundle();
             bundle.putString(SAVE_IMG_PATH, imgPath);
-            bundle.putString(SAVE_IMG_PARENT_PATH, mFilePath);
+            // bundle.putString(SAVE_IMG_PARENT_PATH, mFilePath);
             m.setData(bundle);
         }
         handler.sendMessage(m);
@@ -75,15 +78,9 @@ public class SavePicHandler extends Handler {
             return null;
         }
 
-/*        String mImagePath = pictureDir + File.separator
-                + "pecoo" + File.separator
-                + new DateFormat().format("yyyyMMddHHmmss",
-                new Date()).toString()
-                + ".jpg";*/
+        String mParentFilePath = FileUtils.getPhotoPathForLockWallPaper();
 
-        mFilePath = FileUtils.getPhotoPathForLockWallPaper();
-
-        String mImagePath = mFilePath + File.separator
+        String mImagePath = mParentFilePath + File.separator
                 + new DateFormat().format("yyyyMMddHHmmss",
                 new Date()).toString()
                 + ".jpg";
@@ -97,7 +94,7 @@ public class SavePicHandler extends Handler {
         }
         boolean isSuccess = save(bmp, mImagePath);
 
-        if (!isSuccess){
+        if (!isSuccess) {
             return null;
         }
         setPictureDegreeZero(mImagePath);
@@ -151,7 +148,7 @@ public class SavePicHandler extends Handler {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
-        }finally {
+        } finally {
             if (bos != null) {
                 try {
                     bos.flush();
@@ -183,8 +180,5 @@ public class SavePicHandler extends Handler {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
-
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.TextView;
 
@@ -24,8 +25,8 @@ public class CameraManager {
     private static final String TAG = CameraManager.class.getSimpleName();
     private static CameraManager mInstance;
     public static List<FlashLightStatus> mFlashLightNotSupport = new ArrayList<>();
-    public static final String[] RES_STRING_FLASHLIGHT = {"自动", "打开", "关闭"};
-    public static final String[] RES_STRING_CAMERA_DIRECTION = {"后摄像头", "前摄像头"};
+    private String[] flashHint;
+    private String[] cameraDireHint;
     public static final int TYPE_PREVIEW = 0;
     public static final int TYPE_PICTURE = 1;
     public static final int ALLOW_PIC_LEN = 2000;       //最大允许的照片尺寸的长度   宽或者高
@@ -52,7 +53,7 @@ public class CameraManager {
         this.mContext = context;
 
         // 默认 自动
-        mFlashLightStatus = FlashLightStatus.valueOf(FlashLightStatus.LIGHT_AUTO.ordinal());
+        mFlashLightStatus = FlashLightStatus.valueOf(FlashLightStatus.LIGHT_OFF.ordinal());
         // 默认后置摄像头
         mCameraDirection = CameraDirection.valueOf(CameraDirection.CAMERA_BACK.ordinal());
     }
@@ -64,9 +65,12 @@ public class CameraManager {
      * @param tvFlashLight
      * @param tvCameraDirection
      */
-    public void bindOptionMenuView(TextView tvFlashLight, TextView tvCameraDirection) {
+    public void bindOptionMenuView(TextView tvFlashLight, TextView tvCameraDirection,
+                                   @Nullable String[] flashHint, @Nullable String[] cameraDireHint) {
         mTvFlashLight = tvFlashLight;
         mTvCameraDirection = tvCameraDirection;
+        this.flashHint = flashHint;
+        this.cameraDireHint = cameraDireHint;
 
         // 刷新视图
         setFlashLightStatus(getFlashLightStatus());
@@ -91,8 +95,11 @@ public class CameraManager {
     public void setCameraDirection(CameraDirection mCameraDirection) {
         this.mCameraDirection = mCameraDirection;
         if (mTvCameraDirection != null) {
-            mTvCameraDirection.setText(RES_STRING_CAMERA_DIRECTION[mCameraDirection.ordinal()]);
-
+            if (cameraDireHint != null) {
+                mTvCameraDirection.setText(cameraDireHint[mCameraDirection.ordinal()]);
+            }
+            // 前置摄像头为选中状态
+            mTvCameraDirection.setSelected(mCameraDirection == CameraDirection.CAMERA_FRONT);
             // 设置前后摄像头的图标显示
             // 记录相机方向 sp
             // 前置摄像头不能开启闪光灯
@@ -109,7 +116,10 @@ public class CameraManager {
     public void setFlashLightStatus(FlashLightStatus mFlashLightStatus) {
         this.mFlashLightStatus = mFlashLightStatus;
         if (mTvFlashLight != null) {
-            mTvFlashLight.setText(RES_STRING_FLASHLIGHT[mFlashLightStatus.ordinal()]);
+            if (flashHint != null) {
+                mTvFlashLight.setText(flashHint[mFlashLightStatus.ordinal()]);
+            }
+            mTvFlashLight.setSelected(mFlashLightStatus == FlashLightStatus.LIGHT_ON);
             // 设置各种状态图片
             // 保存当前状态sp
         }
@@ -138,9 +148,9 @@ public class CameraManager {
             if (facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
                 // 某些supportFlashModes  null  不支持
                 if (supportFlashModes != null) {
-                    if (!supportFlashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
+                   /* if (!supportFlashModes.contains(Camera.Parameters.FLASH_MODE_AUTO)) {
                         mFlashLightNotSupport.add(FlashLightStatus.LIGHT_AUTO);
-                    }
+                    }*/
                     if (!supportFlashModes.contains(Camera.Parameters.FLASH_MODE_ON)) {
                         mFlashLightNotSupport.add(FlashLightStatus.LIGHT_ON);
                     }
@@ -230,11 +240,17 @@ public class CameraManager {
                     }
                     Logger.debug(TAG, "摄像头环境亮度为 ： " + cameraLight);
                     if (mTvFlashLight != null) {
-                        //亮度过暗就提醒
-                        if (isDarkEnv && getCameraDirection() == CameraDirection.CAMERA_BACK) {
-                            mTvFlashLight.setVisibility(View.VISIBLE);
-                        } else {
-                            mTvFlashLight.setVisibility(View.GONE);
+                        // 亮度过暗显示开灯按钮
+                        if (getCameraDirection() == CameraDirection.CAMERA_BACK) {
+                            if (isDarkEnv || getFlashLightStatus() == FlashLightStatus.LIGHT_ON) {
+                                if (mTvFlashLight.getVisibility() != View.VISIBLE) {
+                                    mTvFlashLight.setVisibility(View.VISIBLE);
+                                }
+                            } else {
+                                if (mTvFlashLight.getVisibility() != View.GONE) {
+                                    mTvFlashLight.setVisibility(View.GONE);
+                                }
+                            }
                         }
                     }
                 }
@@ -245,9 +261,9 @@ public class CameraManager {
     public void releaseCamera(Camera camera) {
         if (camera != null) {
             try {
-                camera.stopPreview();
                 camera.setPreviewCallback(null);
                 camera.setPreviewCallbackWithBuffer(null);
+                camera.stopPreview();
                 camera.release();
                 camera = null;
             } catch (Exception e) {

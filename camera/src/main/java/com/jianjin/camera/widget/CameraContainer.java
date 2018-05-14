@@ -1,26 +1,21 @@
 package com.jianjin.camera.widget;
 
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.os.SystemClock;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.SeekBar;
 
 import com.jianjin.camera.CameraDirection;
@@ -29,17 +24,12 @@ import com.jianjin.camera.ICameraOperation;
 import com.jianjin.camera.R;
 import com.jianjin.camera.SavePicHandler;
 import com.jianjin.camera.SensorController;
+import com.jianjin.camera.UIHandler;
 import com.jianjin.camera.utils.Logger;
 import com.jianjin.camera.utils.UIUtils;
 
-import java.lang.ref.SoftReference;
-
 import static com.jianjin.camera.utils.Consts.MODE_INIT;
 import static com.jianjin.camera.utils.Consts.MODE_ZOOM;
-import static com.jianjin.camera.utils.Consts.SAVE_IMG_PARENT_PATH;
-import static com.jianjin.camera.utils.Consts.SAVE_IMG_PATH;
-import static com.jianjin.camera.utils.Consts.SAVE_PICTURE_FAILURE;
-import static com.jianjin.camera.utils.Consts.SAVE_PICTURE_SUCCESS;
 
 /**
  * Created by Administrator on 2018/5/9.
@@ -47,6 +37,7 @@ import static com.jianjin.camera.utils.Consts.SAVE_PICTURE_SUCCESS;
 public class CameraContainer extends FrameLayout implements IActivityLifeCycle, ICameraOperation {
 
     public static final int RESET_MASK_DELAY = 1000; //一段时间后遮罩层一定要隐藏
+    private static final String TAG = "CameraContainer";
     private Context mContext;
     private CameraPreview mCameraView;
     private FocusImageView mFocusImageView;
@@ -55,8 +46,9 @@ public class CameraContainer extends FrameLayout implements IActivityLifeCycle, 
     private Activity mActivity;
     private ISavePicCallback savePicCallback;
     private SeekBar mZoomSeekBar;
-    private ImageView scan;
     private HandlerThread handlerThread;
+//    private boolean handlerThreadQuit;
+//    private SavePicHandler savePicHandler;
 
     public CameraContainer(@NonNull Context context) {
         this(context, null);
@@ -74,9 +66,9 @@ public class CameraContainer extends FrameLayout implements IActivityLifeCycle, 
 
     private void init() {
         inflate(mContext, R.layout.custom_camera_container, this);
-        mCameraView =  (CameraPreview)findViewById(R.id.camera_preview);
-        mFocusImageView = (FocusImageView)findViewById(R.id.iv_focus);
-        mZoomSeekBar = (SeekBar)findViewById(R.id.seek_zoom);
+        mCameraView = (CameraPreview) findViewById(R.id.camera_preview);
+        mFocusImageView = (FocusImageView) findViewById(R.id.iv_focus);
+        mZoomSeekBar = (SeekBar) findViewById(R.id.seek_zoom);
 
         mSensorController = SensorController.getInstance();
 
@@ -132,8 +124,10 @@ public class CameraContainer extends FrameLayout implements IActivityLifeCycle, 
         mZoomSeekBar.setOnSeekBarChangeListener(onSeekBarChangeListener);
     }
 
+    private Handler handler = new UIHandler(CameraContainer.this);
     // 拍照回调
     private Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
+
 
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
@@ -144,13 +138,11 @@ public class CameraContainer extends FrameLayout implements IActivityLifeCycle, 
 
 //            new SavePicTask(data, isBackCamera).start();
 
-            if (handlerThread == null) {
-                handlerThread = new HandlerThread("save_picture");
-                handlerThread.start();
-            }
+            Logger.debug(TAG, "创建线程");
+            handlerThread = new HandlerThread("save_picture");
+            handlerThread.start();
 
-            Handler handler = new UiHandler(CameraContainer.this);
-            Handler savePicHandler = new SavePicHandler(handlerThread.getLooper(), handler, data, isBackCamera);
+            SavePicHandler savePicHandler = new SavePicHandler(handlerThread.getLooper(), handler, data, isBackCamera);
             // 开始存储图片
             savePicHandler.sendEmptyMessage(0);
         }
@@ -208,7 +200,9 @@ public class CameraContainer extends FrameLayout implements IActivityLifeCycle, 
 
         mSoundPool.release();
         mSoundPool = null;
-        if (handlerThread != null) handlerThread.quit();
+        if (handlerThread != null) {
+             handlerThread.quit();
+        }
     }
 
     /**
@@ -278,6 +272,13 @@ public class CameraContainer extends FrameLayout implements IActivityLifeCycle, 
         }
     }
 
+    public Activity getActivity() {
+        return mActivity;
+    }
+
+    public ISavePicCallback getSavePicCallback() {
+        return savePicCallback;
+    }
 
     public void bindActivity(Activity activity) {
         this.mActivity = activity;
@@ -445,69 +446,4 @@ public class CameraContainer extends FrameLayout implements IActivityLifeCycle, 
             }, 1000);
         }
     };
-
-
-    public static class UiHandler extends Handler {
-        private String TAG = "CameraContainer.UiHandler";
-
-        private SoftReference<CameraContainer> softReference;
-
-        public UiHandler(CameraContainer cameraContainer) {
-            this.softReference = new SoftReference<>(cameraContainer);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            CameraContainer cameraContainer = softReference.get();
-            if (cameraContainer == null) return;
-
-            Activity activity = cameraContainer.mActivity;
-            if (activity == null) return;
-
-            Bundle bundle = msg.getData();
-            if (bundle == null) return;
-
-            ISavePicCallback savePicCallback = cameraContainer.savePicCallback;
-
-            switch (msg.what) {
-                case SAVE_PICTURE_SUCCESS:
-                    Logger.debug(TAG, "存储成功，打开第二个界面展示照片");
-
-                    String imgPath = bundle.getString(SAVE_IMG_PATH);
-                    String parentPath = bundle.getString(SAVE_IMG_PARENT_PATH);
-
-                    if (parentPath.isEmpty()) return;
-                    if (imgPath.isEmpty()) return;
-
-                    // 数据库插入新图片的信息
-                    ContentValues values = new ContentValues();
-                    ContentResolver resolver = activity.getContentResolver();
-                    values.put(MediaStore.Images.ImageColumns.DATA, imgPath);
-                    values.put(MediaStore.Images.ImageColumns.TITLE,
-                            imgPath.substring(imgPath.lastIndexOf("/") + 1));
-                    values.put(MediaStore.Images.ImageColumns.DATE_TAKEN,
-                            System.currentTimeMillis());
-                    values.put(MediaStore.Images.ImageColumns.MIME_TYPE,
-                            "image/jpeg");
-                    resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                            values);
-
-                    // 发送广播刷新相册（此方法在部分手机上不适配，推荐使用上面的方式）
-               /* Intent refreshIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                Uri uri = Uri.fromFile(new File(parentPath));
-                refreshIntent.setData(uri);
-                activity.sendBroadcast(refreshIntent);*/
-
-                    break;
-                case SAVE_PICTURE_FAILURE:
-                    if (savePicCallback != null) {
-                        savePicCallback.saveFailure("失败");
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
 }

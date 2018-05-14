@@ -26,7 +26,8 @@ public class CameraActivity extends Activity implements ISavePicCallback {
     // Used to load the 'native-lib' library on application startup.
 
     static final int CAMERA_REQUEST_CODE = 100;
-
+    private String[] flashHint = {"打开", "关闭"};
+    private String[] cameraDireHint = {"后摄像头", "前摄像头"};
     private CameraManager mCameraManager;
     private CameraContainer cameraContainer;
     private int REQUEST_PICTURE = 2;
@@ -50,7 +51,7 @@ public class CameraActivity extends Activity implements ISavePicCallback {
         tv.setText(stringFromJNI());*/
         mCameraManager = CameraManager.getInstance(this);
         initView();
-        mCameraManager.bindOptionMenuView(flash, mSwitch);
+        mCameraManager.bindOptionMenuView(flash, mSwitch, flashHint, cameraDireHint);
         setListener();
         checkPermission();
     }
@@ -160,6 +161,7 @@ public class CameraActivity extends Activity implements ISavePicCallback {
 
     @Override
     public void saveComplete(String picPath) {
+        cameraContainer.releaseCamera();
         Intent intent = new Intent(this, PicActivity.class);
         intent.putExtra("imgUri", picPath);
         startActivity(intent);

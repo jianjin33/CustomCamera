@@ -12,7 +12,7 @@ import java.io.File;
 public class FileUtils {
     public static String getPhotoPathForLockWallPaper() {
         String path = Environment.getExternalStorageDirectory().getAbsolutePath()
-                + File.pathSeparator
+                + File.separator
                 + CustomCameraAgent.picFileName;
 
         File file = new File(path);
@@ -22,7 +22,7 @@ public class FileUtils {
         if (!file.exists()) {
             mkdir(file);
         }
-        return Environment.getExternalStorageDirectory().getAbsolutePath() + File.pathSeparator
+        return Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator
                 + CustomCameraAgent.picFileName;
     }
 
