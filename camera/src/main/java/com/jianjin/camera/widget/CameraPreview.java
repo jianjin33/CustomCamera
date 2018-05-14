@@ -16,7 +16,6 @@ import android.view.SurfaceView;
 import android.widget.FrameLayout;
 
 import com.jianjin.camera.CameraDirection;
-import com.jianjin.camera.CameraManager;
 import com.jianjin.camera.FlashLightStatus;
 import com.jianjin.camera.IActivityLifeCycle;
 import com.jianjin.camera.ICameraOperation;

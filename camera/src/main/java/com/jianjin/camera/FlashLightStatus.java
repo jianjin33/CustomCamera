@@ -1,5 +1,7 @@
 package com.jianjin.camera;
 
+import com.jianjin.camera.widget.CameraManager;
+
 /**
  * Created by Administrator on 2018/5/9.
  */

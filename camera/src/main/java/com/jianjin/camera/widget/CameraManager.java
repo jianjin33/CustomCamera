@@ -1,4 +1,4 @@
-package com.jianjin.camera;
+package com.jianjin.camera.widget;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -8,6 +8,8 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.TextView;
 
+import com.jianjin.camera.CameraDirection;
+import com.jianjin.camera.FlashLightStatus;
 import com.jianjin.camera.utils.Logger;
 
 import java.lang.reflect.Method;
@@ -92,7 +94,7 @@ public class CameraManager {
         mTvCameraDirection = null;
     }
 
-    public void setCameraDirection(CameraDirection mCameraDirection) {
+    protected void setCameraDirection(CameraDirection mCameraDirection) {
         this.mCameraDirection = mCameraDirection;
         if (mTvCameraDirection != null) {
             if (cameraDireHint != null) {
@@ -113,7 +115,7 @@ public class CameraManager {
         return mCameraDirection;
     }
 
-    public void setFlashLightStatus(FlashLightStatus mFlashLightStatus) {
+    protected void setFlashLightStatus(FlashLightStatus mFlashLightStatus) {
         this.mFlashLightStatus = mFlashLightStatus;
         if (mTvFlashLight != null) {
             if (flashHint != null) {
@@ -135,7 +137,7 @@ public class CameraManager {
      * @param facing 前后摄像头
      * @return
      */
-    public Camera openCamera(int facing) {
+    protected Camera openCamera(int facing) {
         Camera camera = null;
         if (checkCameraHardware(mContext)) {
             camera = Camera.open(getCameraId(facing));
@@ -258,7 +260,7 @@ public class CameraManager {
         });
     }
 
-    public void releaseCamera(Camera camera) {
+    protected void releaseCamera(Camera camera) {
         if (camera != null) {
             try {
                 camera.setPreviewCallback(null);
@@ -277,7 +279,7 @@ public class CameraManager {
      *
      * @param camera
      */
-    public void setUpPicSize(Camera camera) {
+    private void setUpPicSize(Camera camera) {
         Camera.Parameters parameters = camera.getParameters();
 
         try {
@@ -296,7 +298,7 @@ public class CameraManager {
      *
      * @param camera
      */
-    public void setUpPreviewSize(Camera camera) {
+    private void setUpPreviewSize(Camera camera) {
         Camera.Parameters parameters = camera.getParameters();
 
         try {
@@ -314,7 +316,7 @@ public class CameraManager {
      * @param camera
      * @param bl
      */
-    public void setFitPicSize(Camera camera, float bl) {
+    protected void setFitPicSize(Camera camera, float bl) {
         Camera.Parameters parameters = camera.getParameters();
 
         try {
@@ -333,7 +335,7 @@ public class CameraManager {
      *
      * @param camera
      */
-    public void setFitPreSize(Camera camera) {
+    protected void setFitPreSize(Camera camera) {
         Camera.Parameters parameters = camera.getParameters();
 
         try {
@@ -356,7 +358,7 @@ public class CameraManager {
      * @return
      * @type 尺寸类型 0：preview  1：picture
      */
-    public Camera.Size findBestResolution(Camera cameraInst, double maxDistortion, int type) throws Exception {
+    private Camera.Size findBestResolution(Camera cameraInst, double maxDistortion, int type) throws Exception {
         Camera.Parameters cameraParameters = cameraInst.getParameters();
         List<Camera.Size> supportedPicResolutions = type == TYPE_PREVIEW ? cameraParameters.getSupportedPreviewSizes() : cameraParameters.getSupportedPictureSizes(); // 至少会返回一个值
 
@@ -448,7 +450,7 @@ public class CameraManager {
     /**
      * 控制图像的正确显示方向
      */
-    public void setDisplay(Camera camera) {
+    private void setDisplay(Camera camera) {
         int degrees = 90;
         if (Build.VERSION.SDK_INT >= 14) {
             camera.setDisplayOrientation(degrees);

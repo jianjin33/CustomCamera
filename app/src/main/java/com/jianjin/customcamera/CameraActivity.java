@@ -16,7 +16,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.jianjin.camera.CameraManager;
+import com.jianjin.camera.widget.CameraManager;
 import com.jianjin.camera.utils.UriUtils;
 import com.jianjin.camera.widget.CameraContainer;
 import com.jianjin.camera.widget.ISavePicCallback;
