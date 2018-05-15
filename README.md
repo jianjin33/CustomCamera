@@ -1,5 +1,6 @@
 ## CustomCamera
 android自定义相机
+
 功能描述：
 1. 主要可自定义相机的各类按钮布局
 2. 相机拍照缩放功能
@@ -92,3 +93,17 @@ protected void onDestroy() {
 `mCameraContainer.switchCamera();`  切换前后相机
 
 `mCameraContainer.takePicture(ISavePicCallback);` 拍照，传入存储图片完成后的回调接口ISavePicCallback
+
+## CustomCamera库
+不算复杂的类库，结构如上图，大致介绍一下各自功能，比较重要的类有：
+- CameraCotainer：是个ViewGroup，包含相机预览界面、相机焦点显示隐藏及焦点位置控制，缩放相机预览界面进行缩放的操作和控制；
+- CameraPreview：继承SurfaceView，结合CameraManager控制相机的初始化，开关灯，切换摄像头等功能；
+- FocusImageView ：相机焦点控件；
+- PreviewLightCallback：监听光线是否昏暗，控制是否显示开灯按钮；
+- CustomCameraAgent：初始化库使用；
+- SavePicHandler、UIHandler：存储照片在子线程中进行；
+- SensorController：加速传感器，根据速度大小控制是否开始锁定焦点进行相机变焦。
+
+1. 入口为CustomCameraAgent，进行初始化，配置Application和一些参数。
+2. 相机界面会用到CameraContainer控件，是一个FrameLayout，主要是添加了一个CameraPreview控件，两者都实现了ICameraOperation接口，（是一个操作相机的接口，可以看成CameraContainer是CameraPreview一种代理模式，最终的实现都在CameraPreview中完成，高层只会调用CameraContainer的方法）
+
