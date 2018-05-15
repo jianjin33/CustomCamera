@@ -183,7 +183,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
      * accordingly
      */
     private void determineDisplayOrientation() {
-        if (mActivity == null){
+        if (mActivity == null) {
             throw new IllegalStateException("please bind activity");
         }
 
@@ -332,18 +332,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             t.printStackTrace();
             Logger.info(TAG, "photo fail after Photo Clicked");
 
-            // fixme
-            try {
-//                mCamera.startPreview();
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-
             return false;
         }
-
         try {
-//            mCamera.startPreview();
+            // fixme
+            // mCamera.startPreview();
         } catch (Throwable e) {
             e.printStackTrace();
         }

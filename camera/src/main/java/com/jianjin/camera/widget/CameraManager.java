@@ -79,16 +79,6 @@ public class CameraManager {
         // 刷新视图
         setFlashLightStatus(getFlashLightStatus());
         setCameraDirection(getCameraDirection());
-
-        // 设置监听
-        if (mTvFlashLight != null) {
-            mTvFlashLight.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    setFlashLightStatus(getFlashLightStatus().next());
-                }
-            });
-        }
     }
 
     public void unbindView() {
