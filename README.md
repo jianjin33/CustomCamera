@@ -94,6 +94,8 @@ protected void onDestroy() {
 
 `mCameraContainer.takePicture(ISavePicCallback);` 拍照，传入存储图片完成后的回调接口ISavePicCallback
 
+![效果图](https://upload-images.jianshu.io/upload_images/2809446-527ed1631b6d98a3.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
 ## CustomCamera库
 不算复杂的类库，结构如上图，大致介绍一下各自功能，比较重要的类有：
 - CameraCotainer：是个ViewGroup，包含相机预览界面、相机焦点显示隐藏及焦点位置控制，缩放相机预览界面进行缩放的操作和控制；
