@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,51 +7,75 @@
     tools:context="com.jianjin.customcamera.CameraActivity">
 
     <com.jianjin.camera.widget.CameraContainer
-        android:id="@+id/camera"
+        android:id="@+id/camera_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/button_capture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="拍照" />
+    <ImageView
+        android:id="@+id/camera_iv_back"
+        android:layout_width="40dp"
+        android:layout_height="50dp"
+        android:padding="15dp"
+        android:src="@drawable/camera_ic_back" />
 
-    <TextView
-        android:id="@+id/button_picture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:padding="10dp"
-        android:text="相册" />
-
-    <TextView
-        android:id="@+id/button_flash"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:textColor="@color/colorAccent"
-        android:padding="10dp"
-        android:text="灯" />
-
-    <TextView
-        android:id="@+id/button_switch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginRight="50dp"
-        android:layout_toRightOf="@id/button_picture"
-        android:padding="10dp"
-        android:text="切换" />
+    <ImageView
+        android:id="@+id/camera_iv_history"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="right"
+        android:padding="15dp"
+        android:src="@drawable/camera_ic_history" />
 
     <com.jianjin.camera.widget.CameraAreaView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:layout_margin="50dp" />
+        android:layout_marginBottom="90dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="75dp" />
 
+    <TextView
+        android:id="@+id/camera_tv_light"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="120dp"
+        android:drawableBottom="@drawable/camera_light_selector"
+        android:drawablePadding="15dp"
+        android:gravity="center_horizontal"
+        android:text="看不清？打开灯光"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:visibility="gone" />
 
-</RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="15dp">
+
+        <TextView
+            android:id="@+id/camera_tv_switch"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="45dp"
+            android:background="@drawable/camera_ic_switch" />
+
+        <ImageView
+            android:id="@+id/camera_iv_take"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/camera_ic_take" />
+
+        <ImageView
+            android:id="@+id/camera_iv_picture"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="45dp"
+            android:background="@drawable/camera_ic_picture" />
+    </RelativeLayout>
+</FrameLayout>

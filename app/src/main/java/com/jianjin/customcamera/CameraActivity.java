@@ -13,28 +13,27 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.jianjin.camera.widget.CameraManager;
 import com.jianjin.camera.utils.UriUtils;
 import com.jianjin.camera.widget.CameraContainer;
+import com.jianjin.camera.widget.CameraManager;
 import com.jianjin.camera.widget.ISavePicCallback;
 
 public class CameraActivity extends Activity implements ISavePicCallback {
 
     // Used to load the 'native-lib' library on application startup.
-
     static final int CAMERA_REQUEST_CODE = 100;
-    private String[] flashHint = {"打开", "关闭"};
+    private String[] flashHint = {"关闭","看不清？打开灯光"};
     private String[] cameraDireHint = {"后摄像头", "前摄像头"};
     private CameraManager mCameraManager;
     private CameraContainer cameraContainer;
     private int REQUEST_PICTURE = 2;
     private TextView flash;
-    private TextView picture;
+    private ImageView picture;
     private TextView mSwitch;
-    private Button mTakePictureBtn;
+    private ImageView mTakePictureBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,18 +50,17 @@ public class CameraActivity extends Activity implements ISavePicCallback {
         tv.setText(stringFromJNI());*/
         mCameraManager = CameraManager.getInstance(this);
         initView();
-        mCameraManager.bindOptionMenuView(flash, mSwitch, flashHint, cameraDireHint);
+        mCameraManager.bindOptionMenuView(flash, mSwitch, flashHint, null);
         setListener();
         checkPermission();
     }
 
     private void initView() {
-
-        flash = (TextView) findViewById(R.id.button_flash);
-        cameraContainer = (CameraContainer) findViewById(R.id.camera);
-        picture = (TextView) findViewById(R.id.button_picture);
-        mSwitch = (TextView) findViewById(R.id.button_switch);
-        mTakePictureBtn = (Button) findViewById(R.id.button_capture);
+        cameraContainer = (CameraContainer) findViewById(R.id.camera_container);
+        flash = (TextView) findViewById(R.id.camera_tv_light);
+        picture = (ImageView) findViewById(R.id.camera_iv_picture);
+        mSwitch = (TextView) findViewById(R.id.camera_tv_switch);
+        mTakePictureBtn = (ImageView) findViewById(R.id.camera_iv_take);
     }
 
     private void setListener() {

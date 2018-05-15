@@ -7,7 +7,6 @@ import com.jianjin.camera.CustomCameraAgent;
 /**
  * Created by Administrator on 2018/5/11.
  */
-
 public class MyApplication extends Application {
 
     @Override

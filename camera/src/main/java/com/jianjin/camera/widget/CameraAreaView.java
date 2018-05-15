@@ -16,8 +16,8 @@ public class CameraAreaView extends View {
     private Paint mPaint;
     private int height;
     private int width;
-    private int CORNER_WIDTH = 12;
-    private int CORNER_LENGTH = 44;
+    private int CORNER_WIDTH = 8;
+    private int CORNER_LENGTH = 40;
 
     public CameraAreaView(Context context) {
         this(context, null);
