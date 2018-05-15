@@ -49,11 +49,6 @@ public class SavePicHandler extends Handler {
         this.isBackCamera = isBackCamera;
     }
 
-    public void setData(byte[] data, boolean isBackCamera){
-        this.data = data;
-        this.isBackCamera = isBackCamera;
-    }
-
     @Override
     public void handleMessage(Message msg) {
         super.handleMessage(msg);
@@ -87,11 +82,7 @@ public class SavePicHandler extends Handler {
 
         Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 
-        if (isBackCamera) {
-            bmp = rotateBitmapByDegree(bmp, 90);
-        } else {
-            bmp = rotateBitmapByDegree(bmp, 270);
-        }
+        bmp = rotateReversalBitmap(bmp, isBackCamera);
         boolean isSuccess = save(bmp, mImagePath);
 
         if (!isSuccess) {
@@ -110,16 +101,19 @@ public class SavePicHandler extends Handler {
     /**
      * 将图片按照某个角度进行旋转
      *
-     * @param bm     需要旋转的图片
-     * @param degree 旋转角度
+     * @param bm 需要旋转的图片
      * @return 旋转后的图片
      */
-    public static Bitmap rotateBitmapByDegree(Bitmap bm, int degree) {
+    public static Bitmap rotateReversalBitmap(Bitmap bm, boolean isBackCamera) {
         Bitmap returnBm = null;
 
         // 根据旋转角度，生成旋转矩阵
         Matrix matrix = new Matrix();
-        matrix.postRotate(degree);
+        matrix.postRotate(isBackCamera ? 90 : 270);
+        // 前置摄像头，处理镜像问题
+        if (!isBackCamera) {
+            matrix.postScale(-1, 1);
+        }
         try {
             // 将原始图片按照旋转矩阵进行旋转，并得到新的图片
             returnBm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(),

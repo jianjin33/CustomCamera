@@ -292,6 +292,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         if (mCamera != null) {
             mCameraManager.setPreviewLight(mCamera);
             mCamera.startPreview();
+        }else {
+            // 客户端调用了了CameraContainer.releaseCamera();
+//            setUpCamera(mCameraId, mCameraId == CameraDirection.CAMERA_BACK);
         }
     }
 
