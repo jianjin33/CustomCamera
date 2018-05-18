@@ -24,6 +24,15 @@ dependencies {
         implementation 'com.github.jianjin33:CustomCamera:v1.0.3'
 }
 ```
+或者
+```
+dependencies {
+    compile ('com.github.jianjin33:CustomCamera:v1.0.4',{
+        // 依赖冲突
+        exclude group: 'com.android.support'
+    })
+}
+```
 #### 二、清单文件中配置权限
 ```
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
