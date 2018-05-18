@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 
 /**
  * Created by Administrator on 2018/5/11.
@@ -15,6 +16,7 @@ import android.provider.MediaStore;
 
 public class UriUtils {
     //通用的从uri中获取路径的方法, 兼容以上说到的2个shceme
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static String getPath(final Context context, final Uri uri) {
 
         final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;

@@ -6,4 +6,9 @@
         <attr name="focus_fail_id" format="integer" />
     </declare-styleable>
 
+    <declare-styleable name="CameraAreaView">
+        <attr name="corner_width" format="dimension"/>
+        <attr name="corner_length" format="dimension"/>
+    </declare-styleable>
+    
 </resources>
