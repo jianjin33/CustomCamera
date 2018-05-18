@@ -38,7 +38,7 @@ public class CameraAreaView extends View {
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.CameraAreaView);
         cornerWidth = typedArray.getDimensionPixelOffset(R.styleable.CameraAreaView_corner_width,10);
-        cornerLength = typedArray.getDimensionPixelOffset(R.styleable.CameraAreaView_corner_width,40);
+        cornerLength = typedArray.getDimensionPixelOffset(R.styleable.CameraAreaView_corner_length,40);
         typedArray.recycle();
 
     }

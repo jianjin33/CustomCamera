@@ -289,6 +289,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     @Override
     public void onStart() {
         mOrientationListener.enable();
+        mSensorController.unlockFocus();
         if (mCamera != null) {
             mCameraManager.setPreviewLight(mCamera);
             mCamera.startPreview();
