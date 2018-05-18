@@ -130,7 +130,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private void adjustView(Camera.Size adapterSize) {
         int width = UIUtils.screenWidth;
         int height = UIUtils.screenHeight;
-
         // 让surfaceView的中心和FrameLayout的中心对齐
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) getLayoutParams();
         params.width = width;
