@@ -21,13 +21,13 @@ allprojects {
 Step 2. Add the dependency
 ```
 dependencies {
-        implementation 'com.github.jianjin33:CustomCamera:v1.0.3'
+        implementation 'com.github.jianjin33:CustomCamera:v1.0.41'
 }
 ```
 或者
 ```
 dependencies {
-    compile ('com.github.jianjin33:CustomCamera:v1.0.4',{
+    compile ('com.github.jianjin33:CustomCamera:v1.0.41',{
         // 依赖冲突
         exclude group: 'com.android.support'
     })
