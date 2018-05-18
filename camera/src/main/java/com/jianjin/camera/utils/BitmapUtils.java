@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 
 /**
  * Created by Administrator on 2018/5/18.
+ * 压缩bitmap
  */
 public class BitmapUtils {
     /**
