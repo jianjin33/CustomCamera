@@ -373,6 +373,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
      */
     @Override
     public void setZoom(int zoom) {
+        if (mCamera == null) return;
+
         Camera.Parameters parameters;
         //注意此处为录像模式下的setZoom方式。在Camera.unlock之后，调用getParameters方法会引起android框架底层的异常
         //stackoverflow上看到的解释是由于多线程同时访问Camera导致的冲突，所以在此使用录像前保存的mParameters。
@@ -441,8 +443,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private void setUpCamera(CameraDirection mCameraId, boolean isSwitchFromFront) {
         int facing = mCameraId.ordinal();
         try {
+            // android 6.0以下 部分手机如果拒绝权限时，无法获取拒绝权限的监听，此时mCamera可能为null
             mCamera = mCameraManager.openCamera(facing);
-            //重置对焦计数
+            // 重置对焦计数
             mSensorController.restFocus();
         } catch (Exception e) {
             e.printStackTrace();
@@ -567,8 +570,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             // important
             parameters.setFocusAreas(areas);
             try {
-                //本人使用的小米手机在设置聚焦区域的时候经常会出异常，看日志发现是框架层的字符串转int的时候出错了，
-                //目测是小米修改了框架层代码导致，在此try掉，对实际聚焦效果没影响
+                // 使用的小米手机在设置聚焦区域的时候经常会出异常，看日志发现是框架层的字符串转int的时候出错了，
+                // 目测是小米修改了框架层代码导致，在此try掉，对实际聚焦效果没影响
                 mCamera.setParameters(parameters);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -582,7 +585,9 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     private boolean focus(Camera.AutoFocusCallback callback) {
         try {
-            mCamera.autoFocus(callback);
+            if (mCamera != null) {
+                mCamera.autoFocus(callback);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return false;
